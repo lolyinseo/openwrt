@@ -3,14 +3,14 @@ include $(TOPDIR)/rules.mk
 PKG_NAME:==mt76-mt7615
 PKG_RELEASE=1
 
-PKG_LICENSE:=GPLv2
+PKG_LICENSE:=ISC
 PKG_LICENSE_FILES:=
 
 PKG_SOURCE_URL:=https://github.com/lolyinseo/mt76/tree/mt7615
 PKG_SOURCE_PROTO:=git
-PKG_SOURCE_DATE:=2019-03-27
-PKG_SOURCE_VERSION:=a11b67348aeb2d3175c5995c747e7fc050c7df60
-PKG_MIRROR_HASH:=6ea603308fa568c8ab39eddd86d9c8110a10aa93971348f52ceda0e5bd423ec6
+#PKG_SOURCE_DATE:=2019-03-27
+#PKG_SOURCE_VERSION:=a11b67348aeb2d3175c5995c747e7fc050c7df60
+#PKG_MIRROR_HASH:=6ea603308fa568c8ab39eddd86d9c8110a10aa93971348f52ceda0e5bd423ec6
 
 PKG_MAINTAINER:=Felix Fietkau <nbd@nbd.name>
 PKG_BUILD_PARALLEL:=1
@@ -248,13 +248,10 @@ endef
 
 define KernelPackage/mt7615/install
 	$(INSTALL_DIR) $(1)/lib/firmware
-	cp $(if $(CONFIG_TARGET_ramips_mt76x8), \
-		$(PKG_BUILD_DIR)/firmware/mt7628_e1.bin \
-		$(PKG_BUILD_DIR)/firmware/mt7628_e2.bin \
-		,\
-		$(PKG_BUILD_DIR)/firmware/mt7603_e1.bin \
-		$(PKG_BUILD_DIR)/firmware/mt7603_e2.bin \
-		) \
+	cp \
+		$(PKG_BUILD_DIR)/firmware/mt7615_rom_patch.bin \
+		$(PKG_BUILD_DIR)/firmware/mt7615_cr4.bin \
+		$(PKG_BUILD_DIR)/firmware/mt7615_n9.bin \
 		$(1)/lib/firmware
 endef
 
