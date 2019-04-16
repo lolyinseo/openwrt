@@ -1,12 +1,12 @@
 include $(TOPDIR)/rules.mk
 
-PKG_NAME:=mt76
+PKG_NAME:==mt76-mt7615
 PKG_RELEASE=1
 
 PKG_LICENSE:=GPLv2
 PKG_LICENSE_FILES:=
 
-PKG_SOURCE_URL:=https://github.com/openwrt/mt76
+PKG_SOURCE_URL:=https://github.com/lolyinseo/mt76/tree/mt7615
 PKG_SOURCE_PROTO:=git
 PKG_SOURCE_DATE:=2019-03-27
 PKG_SOURCE_VERSION:=a11b67348aeb2d3175c5995c747e7fc050c7df60
@@ -23,7 +23,8 @@ PKG_CONFIG_DEPENDS += \
 	CONFIG_PACKAGE_kmod-mt76x2-common \
 	CONFIG_PACKAGE_kmod-mt76x2 \
 	CONFIG_PACKAGE_kmod-mt76x2u \
-	CONFIG_PACKAGE_kmod-mt7603
+	CONFIG_PACKAGE_kmod-mt7603	\
+	CONFIG_PACKAGE_kmod-mt7615
 
 STAMP_CONFIGURED_DEPENDS := $(STAGING_DIR)/usr/include/mac80211-backport/backport/autoconf.h
 
@@ -41,7 +42,7 @@ define KernelPackage/mt76
   SUBMENU:=Wireless Drivers
   TITLE:=MediaTek MT76x2/MT7603 wireless driver (metapackage)
   DEPENDS:= \
-	+kmod-mt76-core +kmod-mt76x2 +kmod-mt7603
+	+kmod-mt76-core +kmod-mt76x2 +kmod-mt7603 +kmod-mt7615
 endef
 
 define KernelPackage/mt76-core
@@ -138,6 +139,15 @@ define KernelPackage/mt7603
   AUTOLOAD:=$(call AutoProbe,mt7603e)
 endef
 
+define KernelPackage/mt7615
+  $(KernelPackage/mt76-default)
+  TITLE:=MediaTek MT7615 wireless driver
+  DEPENDS+=@PCI_SUPPORT +kmod-mt76-core
+  FILES:=\
+	$(PKG_BUILD_DIR)/mt7615/mt7615e.ko
+  AUTOLOAD:=$(call AutoProbe,mt7615)
+endef
+
 NOSTDINC_FLAGS = \
 	-I$(PKG_BUILD_DIR) \
 	-I$(STAGING_DIR)/usr/include/mac80211-backport/uapi \
@@ -180,6 +190,9 @@ ifdef CONFIG_PACKAGE_kmod-mt76x2u
 endif
 ifdef CONFIG_PACKAGE_kmod-mt7603
   PKG_MAKE_FLAGS += CONFIG_MT7603E=m
+endif
+ifdef CONFIG_PACKAGE_kmod-mt7615
+  PKG_MAKE_FLAGS += CONFIG_MT7615E=m
 endif
 
 define Build/Compile
@@ -233,6 +246,18 @@ define KernelPackage/mt7603/install
 		$(1)/lib/firmware
 endef
 
+define KernelPackage/mt7615/install
+	$(INSTALL_DIR) $(1)/lib/firmware
+	cp $(if $(CONFIG_TARGET_ramips_mt76x8), \
+		$(PKG_BUILD_DIR)/firmware/mt7628_e1.bin \
+		$(PKG_BUILD_DIR)/firmware/mt7628_e2.bin \
+		,\
+		$(PKG_BUILD_DIR)/firmware/mt7603_e1.bin \
+		$(PKG_BUILD_DIR)/firmware/mt7603_e2.bin \
+		) \
+		$(1)/lib/firmware
+endef
+
 $(eval $(call KernelPackage,mt76-core))
 $(eval $(call KernelPackage,mt76-usb))
 $(eval $(call KernelPackage,mt76x02-usb))
@@ -244,4 +269,5 @@ $(eval $(call KernelPackage,mt76x2-common))
 $(eval $(call KernelPackage,mt76x2u))
 $(eval $(call KernelPackage,mt76x2))
 $(eval $(call KernelPackage,mt7603))
+$(eval $(call KernelPackage,mt7615))
 $(eval $(call KernelPackage,mt76))
