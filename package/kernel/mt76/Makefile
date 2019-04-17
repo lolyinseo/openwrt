@@ -1,13 +1,16 @@
 include $(TOPDIR)/rules.mk
 
-PKG_NAME:==mt76-mt7615
+PKG_NAME:=mt76
+PKG_VERSION:=mt7615
 PKG_RELEASE=1
 
 PKG_LICENSE:=ISC
 PKG_LICENSE_FILES:=
 
-PKG_SOURCE_URL:=https://github.com/lolyinseo/mt76/archive
-PKG_SOURCE:=mt7615.zip
+PKG_HASH=skip
+PKG_SOURCE:=$(PKG_VERSION).zip
+
+PKG_SOURCE_URL:=https://github.com/lolyinseo/mt76/archive/
 
 PKG_MAINTAINER:=Felix Fietkau <nbd@nbd.name>
 PKG_BUILD_PARALLEL:=1
@@ -20,7 +23,7 @@ PKG_CONFIG_DEPENDS += \
 	CONFIG_PACKAGE_kmod-mt76x2-common \
 	CONFIG_PACKAGE_kmod-mt76x2 \
 	CONFIG_PACKAGE_kmod-mt76x2u \
-	CONFIG_PACKAGE_kmod-mt7603	\
+	CONFIG_PACKAGE_kmod-mt7603 \
 	CONFIG_PACKAGE_kmod-mt7615
 
 STAMP_CONFIGURED_DEPENDS := $(STAGING_DIR)/usr/include/mac80211-backport/backport/autoconf.h
@@ -142,7 +145,7 @@ define KernelPackage/mt7615
   DEPENDS+=@PCI_SUPPORT +kmod-mt76-core
   FILES:=\
 	$(PKG_BUILD_DIR)/mt7615/mt7615e.ko
-  AUTOLOAD:=$(call AutoProbe,mt7615)
+  AUTOLOAD:=$(call AutoProbe,mt7615e)
 endef
 
 NOSTDINC_FLAGS = \
